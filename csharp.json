@@ -1,0 +1,111 @@
+{
+/*
+	// Place your snippets for C# here. Each snippet is defined under a snippet name and has a prefix, body and 
+	// description. The prefix is what is used to trigger the snippet and the body will be expanded and inserted. Possible variables are:
+	// $1, $2 for tab stops, $0 for the final cursor position, and ${1:label}, ${2:another} for placeholders. Placeholders with the 
+	// same ids are connected.
+	// Example:
+	"Print to console": {
+		"prefix": "log",
+		"body": [
+			"console.log('$1');",
+			"$2"
+		],
+		"description": "Log output to console"
+	}
+*/
+"Exposed Property":{
+	"prefix": "propeditor",
+	"body":[
+		"[SerializeField]",
+		"private ${1:int} ${2:_pizza};",
+		"public ${1:int} ${3:Pizza}{",
+		"	get",
+		"	{",
+		"		return ${2:_pizza};",
+		"	}",
+		"	private set",
+		"	{",
+		"		${2:_pizza} = value;",
+		"	}",
+		"}"
+	],
+
+	"description": "Expose C# properties in the Unity Editor. By default the setter is private, implying some kind of Inspector configurable Constructor"
+},
+	"Scriptable Singleton": {
+		"prefix": "scriptablesingleton",
+		"body": [
+			"using UnityEngine;",
+			"",
+			"public class ${1:PizzaManager} : ScriptableObject",
+			"{",
+			"	private static ${1:PizzaManager} _instance = null;",
+			"	public static ${1:PizzaManager} Instance",
+			"{",
+			"		get{",
+			"			if(_instance == null)",
+			"			{",
+			"				var res = Resources.LoadAll<${1:PizzaManager}>(\"Options\");",
+			"				if(res.Length > 0)",
+			"				{",
+			"					_instance = res[0];",
+			"					if(res.Length > 1){",
+			"						Debug.LogWarning(\"Multiple TestMe assets found. Using: \" + res[0].name);",
+			"					}",
+			"					return _instance;",
+			"				}else{",
+			"					var resList = Resources.FindObjectsOfTypeAll<${1:PizzaManager}>();",
+			"					if(resList != null && resList.Length > 0 )",
+			"					{",
+			"						Debug.LogWarning(\"No ${1:PizzaManager} found in Resources/Options, using alternative: \" + resList[0].name);",
+			"						_instance = resList[0];",
+			"						return _instance;",
+			"					}",
+			"					Debug.LogError(\"No ${1:PizzaManager} found in Resources/Options, generating alternative with default values.\");",
+			"					_instance = ${1:PizzaManager}.CreateInstance<${1:PizzaManager}>();",
+			"					return _instance;",
+			"				}",
+			"			}else{",
+			"				return _instance;",
+			"			}",
+			"		}",
+			"	}",
+			"",
+			"#if UNITY_EDITOR",
+			"	[UnityEditor.MenuItem(\"Options/${1:PizzaManager}\")]",
+			"	public static void EditorCreateObject()",
+			"	{",
+			"		var list = Resources.LoadAll<${1:PizzaManager}>(\"Options\");",
+			"		if( list.Length > 1)",
+			"		{",
+			"			Debug.LogError(\"Multiple instances of ${1:PizzaManager} found in \\\"Resources/Options\\\". This will cause unexpected behaviour.\");",
+			"			UnityEditor.EditorUtility.FocusProjectWindow();",
+			"			UnityEditor.Selection.activeObject = Resources.Load<${1:PizzaManager}>(\"Options\");",
+			"			return;",
+			"		}",
+			"",
+			"		var asset = ScriptableObject.CreateInstance<${1:PizzaManager}>();",
+			"		if(!UnityEditor.AssetDatabase.IsValidFolder(\"Assets/Resources\"))",
+			"		{",
+			"			UnityEditor.AssetDatabase.CreateFolder(\"Assets\", \"Resources\");",
+			"		}",
+			"		if(!UnityEditor.AssetDatabase.IsValidFolder(\"Assets/Resources/Options\"))",
+			"		{",
+			"			UnityEditor.AssetDatabase.CreateFolder(\"Assets/Resources\", \"Options\");",
+			"		}",
+			"",
+			"		var name = \"Assets/Resources/Options/${1:PizzaManager}Instance.asset\";",
+			"		UnityEditor.AssetDatabase.CreateAsset(asset, name);",
+			"",
+			"		UnityEditor.AssetDatabase.SaveAssets();",
+			"		UnityEditor.EditorUtility.FocusProjectWindow();",
+			"		UnityEditor.Selection.activeObject = asset;",
+			"	}",
+			"#endif",
+			"",
+			"}"
+		],
+		"description": "A settings object for Unity. It implements a ScriptableObject with static singleton instance and generator to create an instance in the always included \"Resources/Settings\" folder."
+	}
+}
